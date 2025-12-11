@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Structure Identifier</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .station {
+      transition: all 0.3s ease;
+    }
+    
+    .station:hover {
+      transform: scale(1.05);
+    }
+    
+    .active-station {
+      animation: pulse 1s infinite;
+    }
+    
+    .player-token {
+      transition: all 0.5s ease;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="w-full h-full overflow-auto"></div>
+  <script>
+    const defaultConfig = {
+      game_title: "Control Structure Identifier",
+      instructions_header: "How to Play",
+      win_message: "Congratulations! You've mastered control structures!",
+      background_color: "#1e293b",
+      surface_color: "#334155",
+      text_color: "#f1f5f9",
+      primary_action_color: "#3b82f6",
+      secondary_action_color: "#8b5cf6",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    const problemCards = [
+      { id: 1, text: "Display numbers 1 to 10", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 2, text: "Add numbers until user enters -1", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 3, text: "Check if a number is even", answer: "Selection", method: "If", solved: false },
+      { id: 4, text: "Display 'Pass' if marks ≥ 50, else 'Fail'", answer: "Selection", method: "If-Else", solved: false },
+      { id: 5, text: "Calculate sum of numbers 1 to 20", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 6, text: "Show grade: A (80+), B (60-79), C (40-59), F (<40)", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 7, text: "Read 3 numbers, add them, display result", answer: "Sequence", method: "None", solved: false },
+      { id: 8, text: "Read numbers until 0 is entered", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 9, text: "Check if a number is positive", answer: "Selection", method: "If", solved: false },
+      { id: 10, text: "Show if number is positive, negative, or zero", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 11, text: "Print multiplication table of 5 (1 to 10)", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 12, text: "Keep reading numbers until sum reaches 100", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 13, text: "Check if a number is greater than 50", answer: "Selection", method: "If", solved: false },
+      { id: 14, text: "Display 'Even' or 'Odd' for a number", answer: "Selection", method: "If-Else", solved: false },
+      { id: 15, text: "Calculate 5 × 4 × 3 × 2 × 1", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 16, text: "Show size: Small (<10), Medium (10-20), Large (>20)", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 17, text: "Input two numbers, multiply them, show result", answer: "Sequence", method: "None", solved: false },
+      { id: 18, text: "Add numbers until sum is greater than 50", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 19, text: "Check if a number is less than 100", answer: "Selection", method: "If", solved: false },
+      { id: 20, text: "Show 'Big' if number > 10, else 'Small'", answer: "Selection", method: "If-Else", solved: false },
+      { id: 21, text: "Display even numbers from 2 to 20", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 22, text: "Keep adding numbers until negative is entered", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 23, text: "Show level: Easy (1-3), Medium (4-6), Hard (7-10)", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 24, text: "Check if a number equals 10", answer: "Selection", method: "If", solved: false },
+      { id: 25, text: "Display squares of numbers 1 to 10", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 26, text: "Read numbers until total count reaches 5", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 27, text: "Show score: High (80+), Medium (50-79), Low (<50)", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 28, text: "Set A = 5, B = 3, calculate A + B, display answer", answer: "Sequence", method: "None", solved: false },
+      { id: 29, text: "Check if a number is divisible by 3", answer: "Selection", method: "If", solved: false },
+      { id: 30, text: "Show 'Yes' if number > 5, else 'No'", answer: "Selection", method: "If-Else", solved: false },
+      { id: 31, text: "Print numbers 10 down to 1", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 32, text: "Multiply numbers until result exceeds 100", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 33, text: "Check if a number is divisible by 2", answer: "Selection", method: "If", solved: false },
+      { id: 34, text: "Show 'Adult' if age ≥ 18, else 'Child'", answer: "Selection", method: "If-Else", solved: false },
+      { id: 35, text: "Calculate average of 10 numbers", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 36, text: "Show category: A (1-10), B (11-20), C (21-30)", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 37, text: "Input number, double it, show result", answer: "Sequence", method: "None", solved: false },
+      { id: 38, text: "Read numbers until 999 is entered", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 39, text: "Check if a number is greater than 0", answer: "Selection", method: "If", solved: false },
+      { id: 40, text: "Show 'Hot' if temp > 30, else 'Cold'", answer: "Selection", method: "If-Else", solved: false },
+      { id: 41, text: "Add 1+2+3+4+5+6+7+8+9+10", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 42, text: "Count numbers entered until -1 appears", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 43, text: "Show temp: Cold (<15), Warm (15-25), Hot (>25)", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 44, text: "Check if a number is between 1 and 100", answer: "Selection", method: "If", solved: false },
+      { id: 45, text: "Calculate 2 × 2 × 2 × 2 (2 to power 4)", answer: "Repetition", method: "Counter-controlled", solved: false },
+      { id: 46, text: "Add numbers until zero is entered", answer: "Repetition", method: "Sentinel", solved: false },
+      { id: 47, text: "Show price: $5 (age 0-12), $10 (13-59), $7 (60+)", answer: "Selection", method: "If-Else-If", solved: false },
+      { id: 48, text: "Read number, subtract 5, display result", answer: "Sequence", method: "None", solved: false },
+      { id: 49, text: "Show 'Pass' if marks ≥ 40, else 'Fail'", answer: "Selection", method: "If-Else", solved: false },
+      { id: 50, text: "Check if a number is divisible by 5", answer: "Selection", method: "If", solved: false }
+    ];
+
+    const stations = [
+      { step: 1, question: "Does it repeat actions?", yesNext: 2, noNext: 5 },
+      { step: 2, question: "Do you know exact iterations?", yesNext: 3, noNext: 4 },
+      { step: 3, question: "Use Counter-controlled loop", isAnswer: true, answer: "Repetition", method: "Counter-controlled" },
+      { step: 4, question: "Use Sentinel-controlled loop", isAnswer: true, answer: "Repetition", method: "Sentinel" },
+      { step: 5, question: "Does it make decisions?", yesNext: 6, noNext: 7 },
+      { step: 6, question: "How many conditions?", isChoice: true, options: [
+        { label: "1 (If)", answer: "Selection", method: "If" },
+        { label: "2 (If-Else)", answer: "Selection", method: "If-Else" },
+        { label: "3+ (If-Else-If)", answer: "Selection", method: "If-Else-If" }
+      ]},
+      { step: 7, question: "It's Sequential execution", isAnswer: true, answer: "Sequence", method: "None" }
+    ];
+
+    let gameState = {
+      currentProblem: null,
+      currentStep: 1,
+      score: 0,
+      problemsSolved: 0,
+      showInstructions: true,
+      gameWon: false,
+      startTime: null,
+      endTime: null
+    };
+    
+    let timerInterval = null;
+
+    function render() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const app = document.getElementById('app');
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      
+      app.style.backgroundColor = bgColor;
+      app.style.color = textColor;
+      app.style.fontFamily = `${customFont}, system-ui, -apple-system, sans-serif`;
+      app.style.fontSize = `${baseSize}px`;
+      
+      if (gameState.showInstructions) {
+        app.innerHTML = `
+          <div style="max-width: 800px; margin: 0 auto; padding: ${baseSize * 2}px;">
+            <div style="background: ${surfaceColor}; border-radius: 16px; padding: ${baseSize * 2}px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+              <h1 style="font-size: ${baseSize * 1.8}px; font-weight: 800; margin-bottom: ${baseSize * 0.5}px; text-align: center; color: ${textColor}; line-height: 1.2;">${config.game_title || defaultConfig.game_title}</h1>
+              <p style="font-size: ${baseSize * 1.5}px; font-weight: 700; margin-bottom: ${baseSize}px; text-align: center; color: ${secondaryColor};">(CS_i)</p>
+              
+              <h2 style="font-size: ${baseSize * 1.5}px; font-weight: 700; margin-top: ${baseSize * 1.5}px; margin-bottom: ${baseSize}px; color: ${primaryColor};">${config.instructions_header || defaultConfig.instructions_header}</h2>
+              
+              <div style="background: ${bgColor}; padding: ${baseSize * 1.5}px; border-radius: 12px; margin-bottom: ${baseSize * 1.5}px;">
+                <p style="font-size: ${baseSize}px; line-height: 1.6; margin-bottom: ${baseSize}px;">
+                  🎯 <strong>Objective:</strong> Navigate through 7 stations to identify the correct control structure for each problem!
+                </p>
+                <p style="font-size: ${baseSize}px; line-height: 1.6; margin-bottom: ${baseSize * 0.5}px;">
+                  🎲 <strong>How to Play:</strong>
+                </p>
+                <ul style="font-size: ${baseSize * 0.9}px; line-height: 1.8; margin-left: ${baseSize * 1.5}px; margin-bottom: ${baseSize}px; list-style-type: disc;">
+                  <li style="margin-bottom: ${baseSize * 0.3}px;">Draw a problem card and answer YES/NO questions at each station</li>
+                  <li style="margin-bottom: ${baseSize * 0.3}px;">Follow the path based on your answers</li>
+                  <li style="margin-bottom: ${baseSize * 0.3}px;">Select the correct control structure and method when you reach an answer station</li>
+                  <li style="margin-bottom: ${baseSize * 0.3}px;">Earn points for correct answers (wrong answers cost you points!)</li>
+                  <li style="margin-bottom: ${baseSize * 0.3}px;">First to solve 10 problems correctly wins!</li>
+                </ul>
+                <p style="font-size: ${baseSize * 0.85}px; line-height: 1.6; color: ${secondaryColor};">
+                  💡 <strong>Tip:</strong> Think carefully about each question before making your choice!
+                </p>
+              </div>
+              
+              <button id="start-btn" style="width: 100%; background: ${primaryColor}; color: white; padding: ${baseSize}px ${baseSize * 2}px; border: none; border-radius: 12px; font-size: ${baseSize * 1.25}px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">
+                🚀 Start Adventure
+              </button>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('start-btn').onmouseover = (e) => {
+          e.target.style.transform = 'scale(1.05)';
+          e.target.style.boxShadow = '0 8px 24px rgba(59, 130, 246, 0.4)';
+        };
+        document.getElementById('start-btn').onmouseout = (e) => {
+          e.target.style.transform = 'scale(1)';
+          e.target.style.boxShadow = 'none';
+        };
+        document.getElementById('start-btn').onclick = () => {
+          gameState.showInstructions = false;
+          gameState.startTime = Date.now();
+          startTimer();
+          startNewProblem();
+        };
+      } else if (gameState.gameWon) {
+        const timeTaken = Math.floor((gameState.endTime - gameState.startTime) / 1000);
+        const minutes = Math.floor(timeTaken / 60);
+        const seconds = timeTaken % 60;
+        const timeDisplay = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        
+        let winMessage = "";
+        let winEmoji = "";
+        let winColor = "";
+        
+        if (gameState.score >= 80 && timeTaken < 180) {
+          winMessage = "Congrats, you have MASTER control structure";
+          winEmoji = "🏆";
+          winColor = "#10b981";
+        } else if (gameState.score >= 60 && timeTaken < 300) {
+          winMessage = "Good effort. Do better next time";
+          winEmoji = "👍";
+          winColor = "#f59e0b";
+        } else {
+          winMessage = "Don't give up. Need improvement.";
+          winEmoji = "💪";
+          winColor = "#ef4444";
+        }
+        
+        app.innerHTML = `
+          <div style="max-width: 800px; margin: 0 auto; padding: ${baseSize * 2}px; text-align: center;">
+            <div style="background: ${surfaceColor}; border-radius: 16px; padding: ${baseSize * 3}px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+              <div style="font-size: ${baseSize * 4}px; margin-bottom: ${baseSize}px;">${winEmoji}</div>
+              <h1 style="font-size: ${baseSize * 2.5}px; font-weight: 800; margin-bottom: ${baseSize}px; color: ${winColor};">${winMessage}</h1>
+              <p style="font-size: ${baseSize * 1.5}px; margin-bottom: ${baseSize}px; color: ${textColor};">Final Score: <strong>${gameState.score}</strong> points</p>
+              <p style="font-size: ${baseSize * 1.3}px; margin-bottom: ${baseSize * 2}px; color: ${secondaryColor};">⏱️ Time Taken: <strong>${timeDisplay}</strong></p>
+              <button id="restart-btn" style="background: ${primaryColor}; color: white; padding: ${baseSize}px ${baseSize * 2}px; border: none; border-radius: 12px; font-size: ${baseSize * 1.25}px; font-weight: 700; cursor: pointer;">
+                🔄 Play Again
+              </button>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('restart-btn').onclick = () => {
+          problemCards.forEach(p => p.solved = false);
+          gameState = {
+            currentProblem: null,
+            currentStep: 1,
+            score: 0,
+            problemsSolved: 0,
+            showInstructions: false,
+            gameWon: false,
+            startTime: Date.now(),
+            endTime: null
+          };
+          startTimer();
+          startNewProblem();
+        };
+      } else {
+        renderGameBoard();
+      }
+    }
+
+    function renderGameBoard() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const app = document.getElementById('app');
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      
+      const currentStation = stations.find(s => s.step === gameState.currentStep);
+      
+      app.innerHTML = `
+        <div style="max-width: 1200px; margin: 0 auto; padding: ${baseSize * 0.8}px; display: flex; flex-direction: column; height: 100%;">
+          <div style="background: ${surfaceColor}; border-radius: 12px; padding: ${baseSize * 0.8}px; margin-bottom: ${baseSize * 0.6}px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: ${baseSize * 0.5}px;">
+              <div>
+                <h1 style="font-size: ${baseSize * 1.1}px; font-weight: 800; color: ${textColor}; margin: 0; line-height: 1.2;">${config.game_title || defaultConfig.game_title}</h1>
+                <p style="font-size: ${baseSize * 0.85}px; font-weight: 700; color: ${secondaryColor}; margin: 0;">(CS_i)</p>
+              </div>
+              <div style="display: flex; gap: ${baseSize * 0.8}px; font-size: ${baseSize * 0.75}px;">
+                <span style="background: ${primaryColor}; padding: ${baseSize * 0.4}px ${baseSize * 0.7}px; border-radius: 6px; font-weight: 700;">📊 ${gameState.score}</span>
+                <span style="background: ${secondaryColor}; padding: ${baseSize * 0.4}px ${baseSize * 0.7}px; border-radius: 6px; font-weight: 700;">✅ ${gameState.problemsSolved}/10</span>
+                <span id="timer-display" style="background: ${surfaceColor}; border: 2px solid ${primaryColor}; padding: ${baseSize * 0.4}px ${baseSize * 0.7}px; border-radius: 6px; font-weight: 700;">⏱️ 0:00</span>
+              </div>
+            </div>
+          </div>
+          
+          <div style="background: ${surfaceColor}; border-radius: 12px; padding: ${baseSize * 0.8}px; margin-bottom: ${baseSize * 0.6}px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <h3 style="font-size: ${baseSize * 0.9}px; font-weight: 700; margin-bottom: ${baseSize * 0.5}px; color: ${primaryColor};">🎯 Problem:</h3>
+            <p style="font-size: ${baseSize * 1.1}px; background: ${bgColor}; padding: ${baseSize * 0.6}px; border-radius: 8px; color: ${textColor}; margin: 0;">${gameState.currentProblem.text}</p>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: ${baseSize * 0.4}px; margin-bottom: ${baseSize * 0.6}px;">
+            ${stations.map(station => `
+              <div class="station ${station.step === gameState.currentStep ? 'active-station' : ''}" style="background: ${station.step === gameState.currentStep ? primaryColor : surfaceColor}; border: 2px solid ${station.step === gameState.currentStep ? secondaryColor : 'transparent'}; border-radius: 8px; padding: ${baseSize * 0.5}px ${baseSize * 0.3}px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); opacity: ${station.step <= gameState.currentStep ? '1' : '0.5'};">
+                <div style="font-size: ${baseSize * 1.2}px; margin-bottom: ${baseSize * 0.2}px;">${station.step === gameState.currentStep ? '📍' : station.step < gameState.currentStep ? '✅' : '🔒'}</div>
+                <h4 style="font-size: ${baseSize * 0.65}px; font-weight: 700; color: ${station.step === gameState.currentStep ? 'white' : primaryColor}; margin: 0;">${station.step}</h4>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div style="background: ${surfaceColor}; border-radius: 12px; padding: ${baseSize}px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex: 1; display: flex; flex-direction: column;">
+            <h3 style="font-size: ${baseSize * 1.1}px; font-weight: 700; margin-bottom: ${baseSize * 0.8}px; color: ${textColor};">🎲 Station ${currentStation.step}: ${currentStation.question}</h3>
+            <div id="choices" style="flex: 1; display: flex; flex-direction: column; justify-content: center;"></div>
+          </div>
+        </div>
+      `;
+      
+      const choicesDiv = document.getElementById('choices');
+      
+      if (currentStation.isAnswer) {
+        choicesDiv.innerHTML = `
+          <p style="font-size: ${baseSize * 0.95}px; margin-bottom: ${baseSize * 1.2}px; color: ${textColor};">Check your answer. Press Submit.</p>
+          <button id="submit-answer" style="width: 100%; background: ${primaryColor}; color: white; padding: ${baseSize * 1.2}px; border: none; border-radius: 12px; font-size: ${baseSize * 1.1}px; font-weight: 700; cursor: pointer;">
+            ✨ Submit Answer
+          </button>
+        `;
+        
+        document.getElementById('submit-answer').onclick = () => checkAnswer(currentStation);
+      } else if (currentStation.isChoice) {
+        choicesDiv.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: ${baseSize}px;">
+            ${currentStation.options.map((opt, idx) => `
+              <button class="choice-btn" data-idx="${idx}" style="background: ${surfaceColor}; border: 2px solid ${primaryColor}; color: ${textColor}; padding: ${baseSize}px; border-radius: 12px; font-size: ${baseSize}px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                ${opt.label}
+              </button>
+            `).join('')}
+          </div>
+        `;
+        
+        document.querySelectorAll('.choice-btn').forEach(btn => {
+          btn.onmouseover = (e) => {
+            e.target.style.background = primaryColor;
+            e.target.style.color = 'white';
+            e.target.style.transform = 'translateX(8px)';
+          };
+          btn.onmouseout = (e) => {
+            e.target.style.background = surfaceColor;
+            e.target.style.color = textColor;
+            e.target.style.transform = 'translateX(0)';
+          };
+          btn.onclick = (e) => {
+            const idx = parseInt(e.target.dataset.idx);
+            const selectedOption = currentStation.options[idx];
+            checkAnswer(selectedOption);
+          };
+        });
+      } else {
+        choicesDiv.innerHTML = `
+          <div style="display: flex; gap: ${baseSize}px;">
+            <button id="yes-btn" style="flex: 1; background: ${primaryColor}; color: white; padding: ${baseSize * 1.2}px; border: none; border-radius: 12px; font-size: ${baseSize * 1.1}px; font-weight: 700; cursor: pointer;">
+              ✅ YES
+            </button>
+            <button id="no-btn" style="flex: 1; background: ${secondaryColor}; color: white; padding: ${baseSize * 1.2}px; border: none; border-radius: 12px; font-size: ${baseSize * 1.1}px; font-weight: 700; cursor: pointer;">
+              ❌ NO
+            </button>
+          </div>
+        `;
+        
+        document.getElementById('yes-btn').onclick = () => {
+          gameState.currentStep = currentStation.yesNext;
+          render();
+        };
+        
+        document.getElementById('no-btn').onclick = () => {
+          gameState.currentStep = currentStation.noNext;
+          render();
+        };
+      }
+    }
+
+    function checkAnswer(answerData) {
+      const correct = answerData.answer === gameState.currentProblem.answer && 
+                     answerData.method === gameState.currentProblem.method;
+      
+      if (correct) {
+        gameState.score += 10;
+        gameState.problemsSolved++;
+        gameState.currentProblem.solved = true;
+        
+        if (gameState.problemsSolved >= 10) {
+          gameState.endTime = Date.now();
+          gameState.gameWon = true;
+          stopTimer();
+          render();
+        } else {
+          showFeedback(true, () => startNewProblem());
+        }
+      } else {
+        gameState.score = Math.max(0, gameState.score - 5);
+        showFeedback(false, () => {
+          gameState.currentStep = 1;
+          render();
+        });
+      }
+    }
+
+    function showFeedback(correct, callback) {
+      const config = window.elementSdk?.config || defaultConfig;
+      const app = document.getElementById('app');
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;`;
+      
+      overlay.innerHTML = `
+        <div style="background: ${surfaceColor}; border-radius: 16px; padding: ${baseSize * 3}px; max-width: 500px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+          <div style="font-size: ${baseSize * 5}px; margin-bottom: ${baseSize}px;">${correct ? '🎉' : '😔'}</div>
+          <h2 style="font-size: ${baseSize * 2}px; font-weight: 800; margin-bottom: ${baseSize}px; color: ${correct ? '#10b981' : '#ef4444'};">
+            ${correct ? 'Correct!' : 'Incorrect!'}
+          </h2>
+          <p style="font-size: ${baseSize * 1.1}px; margin-bottom: ${baseSize * 1.5}px; color: ${textColor};">
+            ${correct ? '+10 points! Keep going!' : '-5 points. Try again from Step 1!'}
+          </p>
+          <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; margin-bottom: ${baseSize * 1.5}px;">
+            <strong>Correct Answer:</strong> ${gameState.currentProblem.answer} - ${gameState.currentProblem.method}
+          </p>
+          <button id="continue-btn" style="background: ${primaryColor}; color: white; padding: ${baseSize}px ${baseSize * 2}px; border: none; border-radius: 12px; font-size: ${baseSize * 1.1}px; font-weight: 700; cursor: pointer;">
+            Continue
+          </button>
+        </div>
+      `;
+      
+      app.appendChild(overlay);
+      
+      document.getElementById('continue-btn').onclick = () => {
+        overlay.remove();
+        callback();
+      };
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        updateTimerDisplay();
+      }, 1000);
+    }
+    
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+    
+    function updateTimerDisplay() {
+      const timerElement = document.getElementById('timer-display');
+      if (timerElement && gameState.startTime) {
+        const elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        timerElement.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }
+    }
+    
+    function startNewProblem() {
+      const availableProblems = problemCards.filter(p => !p.solved);
+      if (availableProblems.length === 0) {
+        // All problems solved, reset for replay
+        problemCards.forEach(p => p.solved = false);
+      }
+      
+      // Ensure balanced distribution across control structures
+      const solvedByType = {
+        repetition: problemCards.filter(p => p.solved && p.answer === "Repetition").length,
+        selection: problemCards.filter(p => p.solved && p.answer === "Selection").length,
+        sequence: problemCards.filter(p => p.solved && p.answer === "Sequence").length
+      };
+      
+      // Determine which type needs more coverage
+      let targetType = null;
+      const minSolved = Math.min(solvedByType.repetition, solvedByType.selection, solvedByType.sequence);
+      
+      if (solvedByType.repetition === minSolved) {
+        targetType = "Repetition";
+      } else if (solvedByType.selection === minSolved) {
+        targetType = "Selection";
+      } else if (solvedByType.sequence === minSolved) {
+        targetType = "Sequence";
+      }
+      
+      // Try to select from the least-covered type first
+      let filteredProblems = availableProblems.filter(p => p.answer === targetType);
+      
+      // If no problems of target type available, use all available
+      if (filteredProblems.length === 0) {
+        filteredProblems = availableProblems;
+      }
+      
+      const selectedProblem = filteredProblems[Math.floor(Math.random() * filteredProblems.length)];
+      gameState.currentProblem = selectedProblem;
+      gameState.currentStep = 1;
+      render();
+    }
+
+    async function onConfigChange(config) {
+      render();
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              config.primary_action_color = value;
+              window.elementSdk.setConfig({ primary_action_color: value });
+            }
+          },
+          {
+            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => {
+              config.secondary_action_color = value;
+              window.elementSdk.setConfig({ secondary_action_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["instructions_header", config.instructions_header || defaultConfig.instructions_header],
+        ["win_message", config.win_message || defaultConfig.win_message]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    render();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac5c75125f21dcd',t:'MTc2NTQ2NDQ2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
